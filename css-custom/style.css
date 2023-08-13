@@ -1,0 +1,51 @@
+
+/* LARGE FONTS  */
+  /* Override the default font size for h1 */
+  .display-1 {
+    font-size: 4rem; /* Adjust this value to make the font even bigger */
+  }
+
+  /* Override the default font size for h2 */
+  .display-2 {
+    font-size: 3.5rem; /* Adjust this value to make the font even bigger */
+  }
+
+  /* Override the default font size for h3 */
+  .display-3 {
+    font-size: 3rem; /* Adjust this value to make the font even bigger */
+  }
+
+  .display-4 {
+    font-size: 2.5rem; /* Adjust this value to make the font even bigger */
+  }
+
+  /* TEXT SHADOW  */
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* COLORS  */
+  .text-gray {
+    color: #777777; /* Replace this with your desired shade of gray color */
+  }
+
+  .text-gray-darker {
+    color: #555555; /* Replace this with your desired shade of gray color */
+  }
+
+  .text-gray-lighter {
+    color: #999999; /* Replace this with your desired shade of gray color */
+  }
+
+
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  /* BACKGROUNDS  */
+  bg-white {
+    background-color: ghostwhite;
+  }
