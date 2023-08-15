@@ -2,13 +2,16 @@
 
 <?php
 // Accepted Requests
-$acceptedRequests = $db->query("SELECT * FROM clearance WHERE formStatus = '1' AND student_name = '".$_SESSION['student']."'")->num_rows;
+$acceptedRequestsResult = $db->query("SELECT * FROM clearance WHERE formStatus = '1' AND student_name = '".$_SESSION['student']."'");
+$acceptedRequests = $acceptedRequestsResult->num_rows ?: 0;
 
 // Rejected Requests
-$rejectedRequests = $db->query("SELECT * FROM clearance WHERE formStatus = '2' AND student_name = '".$_SESSION['student']."'")->num_rows;
+$rejectedRequestsResult = $db->query("SELECT * FROM clearance WHERE formStatus = '2' AND student_name = '".$_SESSION['student']."'");
+$rejectedRequests = $rejectedRequestsResult->num_rows ?: 0;
 
 // Pending Requests
-$pendingRequests = $db->query("SELECT * FROM clearance WHERE formStatus = '' AND student_name = '".$_SESSION['student']."'")->num_rows;
+$pendingRequestsResult = $db->query("SELECT * FROM clearance WHERE formStatus = '' AND student_name = '".$_SESSION['student']."'");
+$pendingRequests = $pendingRequestsResult->num_rows ?: 0;
 
 // Departments
 $departments = $db->query("SELECT * FROM offices")->num_rows;
@@ -28,7 +31,7 @@ $daysRemaining = max(0, ceil($daysRemaining)); // Ensure it's a positive integer
 
 // Calculate the percentage of cleared requests
 $totalRequests = $acceptedRequests + $rejectedRequests + $pendingRequests;
-$clearedPercentage = ($acceptedRequests / $totalRequests) * 100;
+$clearedPercentage = $totalRequests > 0 ? ($acceptedRequests / $totalRequests) * 100 : 0;
 ?>
 
 
