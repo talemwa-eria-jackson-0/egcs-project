@@ -23,25 +23,19 @@
         $date = date('Y-m-d H:i:s');
         $studentId = $_SESSION['student'];
     
-        $sql = $db->query("INSERT INTO clearance (student_name, office, sendStatus, sendDate)
-                           VALUES ('$studentId', '$formid', 1, '$date')");
-        
+        // Check if the form had been previously sent
+        $sql = $db->query("SELECT * FROM clearance WHERE office='$formid' AND student_name='$studentId'");
+        if ($sql->num_rows == 0) {
+            $db->query("INSERT INTO clearance(student_name, office, sendStatus, sendDate) 
+                        VALUES ('$studentId', '$formid', 1, '$date')");
+        } else {
+            $db->query("UPDATE clearance SET formStatus='', sendStatus=1, sendDate='$date' 
+                        WHERE office='$formid' AND student_name='$studentId'");
+        }
+    
         echo "<script>window.history.back();</script>";
-
-        $studentId = $_SESSION['student'];
-        $sql = $db->query("SELECT * FROM offices 
-                  LEFT JOIN clearance ON clearance.office = offices.officeid 
-                  WHERE clearance.student_name = '$studentId' 
-                  ORDER BY officeid ASC");
-
-if( $sql->num_rows == 0){
-         $db->query("INSERT INTO clearance(student_name, office, sendStatus, sendDate) VALUES ('".$_SESSION['student']."', '".$formid."', 1, '".date('d-m-Y')."')");
-     }else{
-         $db->query("UPDATE clearance SET formStatus='' WHERE office='$formid' AND student_name='".$_SESSION['student']."'");
-     }
-     echo "<script>window.history.back();</script>";
-
     }
+    
 
 ?>
 
