@@ -46,25 +46,59 @@
 
  <!-- my custom css  -->
     <link rel="stylesheet" href="css-custom/style.css">
+
+    <style>
+body {
+  /* Set the background image for the whole page */
+  background-image: url('muni-school.jpeg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  height: 100vh; /* full viewport height */
+  margin: 0;
+  padding: 0;
+}
+
+.overlay {
+  /* Create a full-page overlay with opacity */
+  background-color: rgba(0, 0, 0, 0.8); /* Black overlay with 50% opacity */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.img-opacity {
+  opacity: 0.9;
+}
+
+.text-blue {
+  color: blue;
+}
+
+</style>
+
 </head>
 
 <body>
+  <div class="overlay"></div>
     <!-- inserting tje university logo  -->
     <div class="container d-flex justify-content-center">
         <div class="m-5">
-            <img src="admin/images/muni-logo.png" alt="University Logo" class="shadow-lg rounded">
+            <img src="admin/images/muni-logo.png" alt="University Logo" class="shadow-lg rounded img-opacity">
         </div>
     </div>
 
     <hr>
 
     <div class="container d-flex justify-content-center">
-        <h1 class="display-3 text-gray-darker">ELECTRONIC GRADUATION CLEARANCE SYSTEM</h1>
+        <h1 class="display-3 text-gray">ELECTRONIC GRADUATION CLEARANCE SYSTEM</h1>
     </div>
 
     <div class="my-3 ml-5 d-flex justify-content-center">
         <div>
-            <p class="fa fa-user fw-bold text-success">&nbsp; LOGIN TO THE SYSTEM</p>
+            <p class="fa fa-user fw-extrabold text-blue display-4 d-none">&nbsp; LOGIN TO THE SYSTEM</p>
         </div>
     </div>
 
