@@ -154,7 +154,7 @@ if(isset($_POST['save']))
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Email Address</label>
-                                <input type="text" name="usermail" class="form-control" value="<?php echo $usermail ?>" autocomplete="off" required="required">
+                                <input type="text" name="usermail" class="form-control" value="<?php echo $usermail ?>" autocomplete="off" required="required" pattern=".+@muni\.ac\.ug$" required placeholder="staff@muni.ac.ug">
                             </div>
                             
                             <div class="form-group col-md-6">
