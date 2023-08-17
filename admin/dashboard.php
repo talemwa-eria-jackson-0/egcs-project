@@ -12,7 +12,27 @@ $students = $db->query("SELECT * FROM students")->num_rows;
 
 // courses
 $courses = $db->query("SELECT * FROM courses")->num_rows;
+
+// Requests by Office
+$officeDataQuery = "SELECT offices.office_name,
+                           COUNT(clearance.formid) AS totalRequests,
+                           SUM(CASE WHEN clearance.formStatus = 1 THEN 1 ELSE 0 END) AS acceptedRequests,
+                           SUM(CASE WHEN clearance.formStatus = 2 THEN 1 ELSE 0 END) AS rejectedRequests,
+                           SUM(CASE WHEN clearance.formStatus = '' THEN 1 ELSE 0 END) AS pendingRequests
+                    FROM offices
+                    LEFT JOIN clearance ON offices.officeid = clearance.office
+                    GROUP BY offices.officeid
+                    ORDER BY offices.officeid";
+
+$officeDataResult = $db->query($officeDataQuery);
+$officeData = [];
+
+while ($row = $officeDataResult->fetch_assoc()) {
+    $officeData[] = $row;
+}
 ?>
+
+<!-- html  -->
 <div class="content-wrapper">
     <section class="content-header">
         <h1>Dashboard <small>Control panel</small></h1>
@@ -77,5 +97,86 @@ $courses = $db->query("SELECT * FROM courses")->num_rows;
             </div>
         </div>
     </section>
+
+    <!-- Display bar graph for clearances by office -->
+    <section class="content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Requests by Office</h3>
+                    </div>
+                    <div class="box-body">
+                        <canvas id="bar-chart" width="800" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+
+
 <?php include('footer.php') ?>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    // Prepare data for the chart
+    var officeNames = <?php echo json_encode(array_column($officeData, 'office_name')); ?>;
+    var totalRequests = <?php echo json_encode(array_column($officeData, 'totalRequests')); ?>;
+    var acceptedRequests = <?php echo json_encode(array_column($officeData, 'acceptedRequests')); ?>;
+    var rejectedRequests = <?php echo json_encode(array_column($officeData, 'rejectedRequests')); ?>;
+    var pendingRequests = <?php echo json_encode(array_column($officeData, 'pendingRequests')); ?>;
+
+
+    // Create a bar chart using Chart.js
+    var ctx = document.getElementById('bar-chart').getContext('2d');
+    var barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: officeNames,
+            datasets: [
+                {
+                    label: 'Sent Requests',
+                    data: totalRequests,
+                    backgroundColor: 'blue',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Accepted Requests',
+                    data: acceptedRequests,
+                    backgroundColor: 'green',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Rejected Requests',
+                    data: rejectedRequests,
+                    backgroundColor: 'red',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Pending Requests',
+                    data: pendingRequests,
+                    backgroundColor: 'yellow',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    console.log("DOMContentLoaded event fired");
+});
+
+
+</script>
