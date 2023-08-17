@@ -1,3 +1,5 @@
+
+
 <?php include('header.php') ?>
 <?php
 
@@ -14,9 +16,11 @@ $id = '';
 
 $title = 'Add Graduand';
 
+// Initialize the emailExists variable
+$emailExists = false;
+
 // check if there is an edit id
-if(!empty($_GET['id']))
-{
+if (!empty($_GET['id'])) {
     // read the edit id
     $id = $_GET['id'];
 
@@ -30,38 +34,70 @@ if(!empty($_GET['id']))
     $studphone = $student['studPhone'];
     $studCourse = $student['studCourse'];
     $joinYear = $student['joinYear'];
-    
+
     $title = "Update Graduand";
 }
 
 // wait for submit button to be clicked
-if(isset($_POST['save']))
-{
+if (isset($_POST['save'])) {
     // get form values
-    $regNumber = $_POST['regNumber'];
-    $iDNumber = $_POST['iDNumber'];
-    $othernames = $_POST['othernames'];
-    $surname = $_POST['surname'];
-    $studmail = $_POST['studmail'];
-    $studphone = $_POST['studphone'];
-    $studCourse = $_POST['studCourse'];
-    $joinYear = $_POST['joinYear'];
+        // get form values
+        $regNumber = $_POST['regNumber'];
+        $iDNumber = $_POST['iDNumber'];
+        $othernames = $_POST['othernames'];
+        $surname = $_POST['surname'];
+        $studmail = $_POST['studmail'];
+        $studphone = $_POST['studphone'];
+        $studCourse = $_POST['studCourse'];
+        $joinYear = $_POST['joinYear'];
+    
+        // id for updating
+        $idname = $_POST['idname'];
 
-    // id for updating
-    $idname = $_POST['idname'];
+    // Check if the email already exists
+    $existingStudent = $db->query("SELECT * FROM students WHERE studmail = '$studmail'")->fetch_assoc();
+    if ($existingStudent && ($existingStudent['studentid'] != $id)) {
+        $emailExists = true;
+    } else {
+        $emailExists = false;
+    }
 
-    // If there is no key, insert
-    if(empty($_POST['idname']))
-    {
-        // Insert the records
-        $db->query("INSERT INTO students (regNumber, iDNumber, othernames, surname, studmail, studPhone, studCourse, joinYear) VALUES ('$regNumber', '$iDNumber', '$othernames','$surname', '$studmail', '$studphone', '$studCourse',  '$joinYear')");
-        echo "<script>window.location='students.php';</script>";
-    }else{
-        $db->query("UPDATE students SET regNumber='$regNumber', iDNumber='$iDNumber', surname='$surname', studmail='$studmail', othernames='$othernames', studCourse='$studCourse', joinYear='$joinYear', studPhone='$studphone' WHERE studentid='$idname'");
-        echo "<script>window.location='students.php';</script>";
+    if ($emailExists) {
+        echo "This email address is already in use.";
+    } else {
+        // If there is no key, insert
+        if (empty($_POST['idname'])) {
+            // Insert the records
+            $db->query("INSERT INTO students (regNumber, iDNumber, othernames, surname, studmail, studPhone, studCourse, joinYear) VALUES ('$regNumber', '$iDNumber', '$othernames','$surname', '$studmail', '$studphone', '$studCourse',  '$joinYear')");
+            echo "<script>window.location='students.php';</script>";
+        } else {
+            $db->query("UPDATE students SET regNumber='$regNumber', iDNumber='$iDNumber', surname='$surname', studmail='$studmail', othernames='$othernames', studCourse='$studCourse', joinYear='$joinYear', studPhone='$studphone' WHERE studentid='$idname'");
+            echo "<script>window.location='students.php';</script>";
+        }
     }
 }
+
 ?>
+
+<style>
+    .error-message {
+        color: red;
+        margin-top: 2px;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="content-wrapper">
     <section class="content-header">
         <h1>&nbsp;<?php echo $title ?></h1>
@@ -95,9 +131,17 @@ if(isset($_POST['save']))
                         </div>
 
                         <div class="form-group col-md-6">
-                            <label>Email Address</label>
-                            <input type="email" name="studmail" class="form-control" value="<?php echo $studmail ?>" required="required" autocomplete="off" pattern=".+@muni\.ac\.ug$" required placeholder="student@muni.ac.ug">
-                        </div>
+    <label>Email Address</label>
+    <input type="email" name="studmail" class="form-control" value="<?php echo $studmail ?>" required="required" autocomplete="off" pattern=".+@muni\.ac\.ug$" required placeholder="student@muni.ac.ug">
+    
+    <!-- Display the error message if email already exists -->
+    <?php if ($emailExists && ($existingStudent['studentid'] != $id)) : ?>
+        <div class="error-message">This email address is already in use.</div>
+    <?php endif; ?>
+</div>
+
+
+
 
                         <div class="form-group col-md-6">
                             <label>Mobile Phone Number</label>
