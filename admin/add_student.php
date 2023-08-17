@@ -96,7 +96,7 @@ if(isset($_POST['save']))
 
                         <div class="form-group col-md-6">
                             <label>Email Address</label>
-                            <input type="email" name="studmail" class="form-control" value="<?php echo $studmail ?>" required="required" autocomplete="off">
+                            <input type="email" name="studmail" class="form-control" value="<?php echo $studmail ?>" required="required" autocomplete="off" pattern=".+@muni\.ac\.ug$" required placeholder="student@muni.ac.ug">
                         </div>
 
                         <div class="form-group col-md-6">
