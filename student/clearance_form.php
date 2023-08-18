@@ -1,41 +1,25 @@
 <?php include('header.php') ?>
 
-<?php 
-    // check if send request is clicked
-    // if( !empty($_GET['formid']) )
-    // {
-    //     // update the form link
-    //     $formid = $_GET['formid'];
-    //     $date = date('Y-m-d H:i:s');
+<?php
 
-    //     // check if the form had been previously sent
-    //     $sql = $db->query("SELECT * FROM clearance WHERE office='$formid' AND student_name='".$_SESSION['student']."'");
-    //     if( $sql->num_rows == 0){
-    //         $db->query("INSERT INTO clearance(student_name, office, sendStatus, sendDate) VALUES ('".$_SESSION['student']."', '".$formid."', 1, '".date('d-m-Y')."')");
-    //     }else{
-    //         $db->query("UPDATE clearance SET formStatus='' WHERE office='$formid' AND student_name='".$_SESSION['student']."'");
-    //     }
-    //     echo "<script>window.history.back();</script>";
-    // }
+if (!empty($_GET['formid'])) {
+    $formid = $_GET['formid'];
+    $date = date('Y-m-d H:i:s');
+    $studentId = $_SESSION['student'];
 
-    if (!empty($_GET['formid'])) {
-        $formid = $_GET['formid'];
-        $date = date('Y-m-d H:i:s');
-        $studentId = $_SESSION['student'];
-    
-        // Check if the form had been previously sent
-        $sql = $db->query("SELECT * FROM clearance WHERE office='$formid' AND student_name='$studentId'");
-        if ($sql->num_rows == 0) {
-            $db->query("INSERT INTO clearance(student_name, office, sendStatus, sendDate) 
+    // Check if the form had been previously sent
+    $sql = $db->query("SELECT * FROM clearance WHERE office='$formid' AND student_name='$studentId'");
+    if ($sql->num_rows == 0) {
+        $db->query("INSERT INTO clearance(student_name, office, sendStatus, sendDate) 
                         VALUES ('$studentId', '$formid', 1, '$date')");
-        } else {
-            $db->query("UPDATE clearance SET formStatus='', sendStatus=1, sendDate='$date' 
+    } else {
+        $db->query("UPDATE clearance SET formStatus='', sendStatus=1, sendDate='$date' 
                         WHERE office='$formid' AND student_name='$studentId'");
-        }
-    
-        echo "<script>window.history.back();</script>";
     }
-    
+
+    echo "<script>window.history.back();</script>";
+}
+
 
 ?>
 
@@ -78,40 +62,47 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            
-                            <?php
-// Fetch and display the entire clearance form
-$counter = 0;
-$sql = $db->query("SELECT * FROM offices LEFT JOIN clearance ON clearance.office = offices.officeid AND student_name = '".$_SESSION['student']."' ORDER BY officeid ASC");
-while ($row = $sql->fetch_array()) {
-    $cleared = $row['formStatus'];
-    if ($cleared == 1) {
-        $statusButton = '<button class="btn btn-success btn-sm btn-block"><i class="fa fa-check"></i> Cleared</button>';
-    } elseif ($cleared == 2) {
-        $statusButton = '<button class="btn btn-danger btn-sm btn-block"><i class="fa fa-times"></i> Not Cleared</button>';
-    } elseif ($row['sendStatus'] == 1) {
-        $statusButton = '<button class="btn btn-warning btn-sm btn-block"><i class="fa fa-hourglass-half"></i> Pending</button>';
-    } else {
-        $statusButton = '<button class="btn btn-default btn-sm btn-block">Not Sent</button>';
-    }
 
-    if ($row['formStatus'] == 2 && $row['sendStatus'] == 1) {
-        $btn = '<a href="clearance_form.php?formid=' . $row['officeid'] . '" class="btn btn-primary btn-sm btn-block"><i class="fa fa-redo"></i> Resend Request</a>';
-    } elseif ($row['sendStatus'] == 1) {
-        $btn = '<button class="btn btn-info btn-sm btn-block"><i class="fa fa-envelope"></i> Form Sent</button>';
-    } else {
-        $btn = '<a href="clearance_form.php?formid=' . $row['officeid'] . '" class="btn btn-primary btn-sm btn-block"><i class="fa fa-paper-plane"></i> Send Request</a>';
-    }
-    $counter++;
-?>
-<tr>
-    <td><?php echo $counter ?></td>
-    <td><?php echo $row['office_name']; ?></td>
-    <td style="text-align: center;"><?php echo $statusButton; ?></td>
-    <td><?php echo ($row['formStatus'] == 1 || $row['formStatus'] == 2) ? $row['formComments'] : ''; ?></td>
-    <td><?php echo $btn ?></td>
-</tr>
-<?php } ?>
+                                <?php
+                                // Fetch and display the entire clearance form
+                                $counter = 0;
+                                $sql = $db->query("SELECT * FROM offices LEFT JOIN clearance ON clearance.office = offices.officeid AND student_name = '" . $_SESSION['student'] . "' ORDER BY officeid ASC");
+                                while ($row = $sql->fetch_array()) {
+                                    $cleared = $row['formStatus'];
+                                    if ($cleared == 1) {
+                                        $statusButton = '<button class="btn btn-success btn-sm btn-block"><i class="fa fa-check"></i> Cleared</button>';
+                                    } elseif ($cleared == 2) {
+                                        $statusButton = '<button class="btn btn-danger btn-sm btn-block"><i class="fa fa-times"></i> Not Cleared</button>';
+                                    } elseif ($row['sendStatus'] == 1) {
+                                        $statusButton = '<button class="btn btn-warning btn-sm btn-block"><i class="fa fa-hourglass-half"></i> Pending</button>';
+                                    } else {
+                                        $statusButton = '<button class="btn btn-default btn-sm btn-block">Not Sent</button>';
+                                    }
+
+                                    if ($row['formStatus'] == 2 && $row['sendStatus'] == 1 && $row['allowed'] === null) {
+                                        // Form has been rejected and not allowed
+                                        $btn = '<a href="#" class="btn btn-primary btn-sm btn-block " disabled><i class="fa fa-redo"></i> Resend Request</a>';
+                                    } elseif ($row['formStatus'] == 2 && $row['sendStatus'] == 1 && $row['allowed'] == 1) {
+                                        // Form has been rejected, not cleared, and allowed
+                                        $btn = '<a href="clearance_form.php?formid=' . $row['officeid'] . '" class="btn btn-primary btn-sm btn-block"><i class="fa fa-redo"></i> Resend Request</a>';
+                                    } elseif ($row['sendStatus'] == 1) {
+                                        // Form has been sent, but not rejected
+                                        $btn = '<button class="btn btn-info btn-sm btn-block" disabled><i class="fa fa-envelope"></i> Form Sent</button>';
+                                    } else {
+                                        // Form has not been sent
+                                        $btn = '<a href="clearance_form.php?formid=' . $row['officeid'] . '" class="btn btn-primary btn-sm btn-block"><i class="fa fa-paper-plane"></i> Send Request</a>';
+                                    }
+                                    
+                                    $counter++;
+                                ?>
+                                    <tr>
+                                        <td><?php echo $counter ?></td>
+                                        <td><?php echo $row['office_name']; ?></td>
+                                        <td style="text-align: center;"><?php echo $statusButton; ?></td>
+                                        <td><?php echo ($row['formStatus'] == 1 || $row['formStatus'] == 2) ? $row['formComments'] : ''; ?></td>
+                                        <td><?php echo $btn ?></td>
+                                    </tr>
+                                <?php } ?>
 
                             </tbody>
                         </table>
